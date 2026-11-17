@@ -9,9 +9,11 @@ docker compose up --build -d
 docker compose exec -T app pytest -q
 ```
 
-访问 http://localhost:18243 。启动直接载入现场脏批。切换干净样例和旧编码样例可对照核验。清批20个虚构受试者、40次应访视及5次复检，可锁库冻结。现场脏批包含窗末偏离、缺首次访视、错误复检引用及方案不符，必须处理后才能冻结。
+访问 http://localhost:18243 。启动直接载入现场脏批。切换干净样例、旧编码样例和首采冲突样例可对照核验。清批20个虚构受试者、40次应访视及5次复检，可锁库冻结。现场脏批包含窗末偏离、缺首次访视、错误复检引用及方案不符，必须处理后才能冻结。首采冲突批（conflict）演示原始采血与补录对同一访视给出不同首采时间/入组日期：系统固定保留原始采血为正式首次记录，补录隔离不采信，避免窗外访视被漂白为窗内。
 
-各模块页面对应 `/<模块英文名>`，各模块执行入口为 `POST /api/<模块英文名>`，不传参即可独立演示。完整运行 `POST /api/runs` 支持 `dataset`（dirty/clean/legacy）、`csv_text` 与 `overrides` 参数。批次历史 `GET /api/runs`，详情 `GET /api/runs/{run_id}`。
+CSV支持可选第12列 `source`（`ORIGINAL`/`BACKFILL`，缺省视为ORIGINAL）。补录被隔离为 `BACKFILL_SUPERSEDED`（原始优先）、`BACKFILL_NO_ORIGINAL`（仅补录）或 `ORIGINAL_CONFLICT`（原始互相冲突），原值与正式记录号全程留痕。每批按记录身份生成 `lineage_key` 冲突包标识：同包重跑不新增采信记录；上游更新产生新批号时旧批自动置「已失效」并指向新批，失效批的复核提交返回409。锁库页逐项展示阻断原因，采信页展示正式记录与冲突裁决。
+
+各模块页面对应 `/<模块英文名>`，各模块执行入口为 `POST /api/<模块英文名>`，不传参即可独立演示。完整运行 `POST /api/runs` 支持 `dataset`（dirty/clean/legacy/conflict）、`csv_text` 与 `overrides` 参数。批次历史 `GET /api/runs`，详情 `GET /api/runs/{run_id}`。
 
 同输入与规则版本生成相同批号，只保留一条批次。复核入口 `POST /api/runs/{run_id}/review` 提交当前 `revision`，陈旧提交409。归档包只有一个下载入口 `GET /api/export/{run_id}`，含证据和运行摘要。原始隔离在页面同屏显示。
 

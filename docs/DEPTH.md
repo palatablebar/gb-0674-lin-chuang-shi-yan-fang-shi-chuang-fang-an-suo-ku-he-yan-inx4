@@ -29,6 +29,9 @@
 | TRAP-15 | 检验单位换算 | 静默错算或证据丢失 | 以可复核规则显式处理 | `app/modules/protocol/rules.py` | `tests/test_protocol.py::test_unit_conversion_real` |
 | TRAP-23 | 访视窗末端 | 静默错算或证据丢失 | 以可复核规则显式处理 | `app/modules/windows/rules.py` | `tests/test_windows.py::test_half_open_end` |
 | TRAP-11 | UTC日历归一 | 静默错算或证据丢失 | 以可复核规则显式处理 | `app/modules/windows/rules.py` | `tests/test_windows.py::test_utc_day_equivalence` |
+| TRAP-31 | 补录覆盖原始首采，窗外被漂白为窗内 | 以后录数据直接覆盖首次采样 | 原始采血为正式首次记录，补录隔离不采信，全模块共用结论 | `app/modules/intake/reader.py` | `tests/test_source_conflict.py::test_window_uses_original_not_whitewashed` |
+| TRAP-32 | 仅补录无原始、原始互相冲突 | 自动选一条充当正式记录 | 全部隔离并阻断，不产生正式首次记录 | `app/modules/intake/reader.py` | `tests/test_source_conflict.py::test_backfill_without_original_blocks_visit` |
+| TRAP-33 | 上游更新后旧锁库结论仍可用 | 新批另存，旧结论无失效标记 | 同冲突包新批使旧批失效并双向留痕，失效批复核409 | `app/store.py` | `tests/test_source_conflict.py::test_upstream_update_invalidates_old_lock` |
 
 ## 对账规则
 
